@@ -1,21 +1,27 @@
+from fastapi import Query
 from app.utils.constants import GET_DETECTED_PIIS
-from fastapi import FastAPI
+# from fastapi import FastAPI
 from typing import Dict, List
 from fastapi.middleware.cors import CORSMiddleware
 
+from mcp.server.fastmcp import FastMCP
+
+# Create an MCP server
+mcp = FastMCP()
+
 # Initialize FastAPI
-app = FastAPI()
+# app = FastAPI()
 
 # Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=False,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
-@app.get(GET_DETECTED_PIIS)
+@mcp.tool(GET_DETECTED_PIIS)
 def get_detected_piis(text: str) -> List[Dict]:
     """
     Analyzes text for Personally Identifiable Information (PII) using regex patterns.
@@ -78,3 +84,5 @@ def get_detected_piis(text: str) -> List[Dict]:
             })
     
     return sorted(results, key=lambda x: x['start'])
+
+mcp.run(transport='sse')
